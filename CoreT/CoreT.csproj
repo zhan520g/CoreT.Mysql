@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath></OutputPath>
+    <DocumentationFile>E:\05.Visual Studio\2019\CoreT\CoreT\CoreT.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
+    <PackageReference Include="Castle.Core" Version="4.4.0" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.5.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
+    <PackageReference Include="MiniProfiler.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="sqlSugarCore" Version="5.0.0.10" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="5.0.0-rc8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="CoreT.Common">
+      <HintPath>..\CoreT.Common\bin\Debug\netcoreapp3.0\CoreT.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="CoreT.Entity">
+      <HintPath>..\CoreT.Entity\bin\Debug\netcoreapp3.0\CoreT.Entity.dll</HintPath>
+    </Reference>
+    <Reference Include="CoreT.IRepository">
+      <HintPath>..\CoreT.IRepository\bin\Debug\netcoreapp3.0\CoreT.IRepository.dll</HintPath>
+    </Reference>
+    <Reference Include="CoreT.IServices">
+      <HintPath>..\CoreT.IServices\bin\Debug\netcoreapp3.0\CoreT.IServices.dll</HintPath>
+    </Reference>
+    <Reference Include="CoreT.Repository">
+      <HintPath>..\CoreT.Repository\bin\Debug\netcoreapp3.0\CoreT.Repository.dll</HintPath>
+    </Reference>
+    <Reference Include="CoreT.Services">
+      <HintPath>..\CoreT.Services\bin\Debug\netcoreapp3.0\CoreT.Services.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\v2\" />
+    <Folder Include="Middlewares\" />
+  </ItemGroup>
+
+</Project>

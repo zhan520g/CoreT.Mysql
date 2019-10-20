@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="auto.Entity\CoreT.Entity.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CoreT.Entity.cs</LastGenOutput>
+    </None>
+    <None Update="auto.IRepository\CoreT.IRepository.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CoreT.IRepository.cs</LastGenOutput>
+    </None>
+    <None Update="auto.IServices\CoreT.IServices.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CoreT.IServices.cs</LastGenOutput>
+    </None>
+    <None Update="auto.Repository\CoreT.Repository.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CoreT.Repository.cs</LastGenOutput>
+    </None>
+    <None Update="auto.Services\CoreT.Services.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CoreT.Services.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="auto.Entity\CoreT.Entity.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CoreT.Entity.tt</DependentUpon>
+    </Compile>
+    <Compile Update="auto.IRepository\CoreT.IRepository.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CoreT.IRepository.tt</DependentUpon>
+    </Compile>
+    <Compile Update="auto.IServices\CoreT.IServices.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CoreT.IServices.tt</DependentUpon>
+    </Compile>
+    <Compile Update="auto.Repository\CoreT.Repository.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CoreT.Repository.tt</DependentUpon>
+    </Compile>
+    <Compile Update="auto.Services\CoreT.Services.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CoreT.Services.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>
