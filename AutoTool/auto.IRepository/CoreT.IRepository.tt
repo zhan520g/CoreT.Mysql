@@ -8,10 +8,12 @@
 <#@ import namespace="System.Xml" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Data" #>
-<#@ import namespace="System.Data.SqlClient" #>
+<#@ assembly name="C:\Users\15292\.nuget\packages\mysql.data\8.0.18\lib\net452\MySql.Data.dll" #>
+<#@ import namespace="MySql.Data.MySqlClient" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.IO" #>
-<#@ include file="$(ProjectDir)DbHelper.ttinclude"  #>
+
+<#@ include file="$(ProjectDir)MysqlDBHelper.ttinclude"  #>
 <#@ include file="$(ProjectDir)ModelAuto.ttinclude"	#>
 
 <# 
@@ -56,17 +58,15 @@ namespace CoreT.IRepository
 	#>
 
 <# 
-    SqlConnection conn = new SqlConnection(config.ConnectionString); 
-    conn.Open(); 
-    System.Data.DataTable schema = conn.GetSchema("TABLES"); 
+     List<DbTable> tableList=DbHelper.GetDbTables(config.ConnectionString,config.DbDatabase);
  #>
 
 <# 
-    foreach(System.Data.DataRow row in schema.Rows) 
+    foreach(var table in tableList) 
     {  
-		manager.StartBlock("I"+row["TABLE_NAME"].ToString()+"Repository"+".cs");//文件名
+		manager.StartBlock("I"+table.TableName+"Repository"+".cs");//文件名
 	 #>
-	//----------<#=row["TABLE_NAME"].ToString()#>开始----------
+	//----------<#=table.TableName #>开始----------
     
 	
 using System;
@@ -74,15 +74,15 @@ using CoreT.Entity;
 namespace CoreT.IRepository
 {	
 	/// <summary>
-	/// I<#=row["TABLE_NAME"].ToString()#>Repository
+	/// I<#=table.TableName #>Repository
 	/// </summary>	
-	public interface I<#=row["TABLE_NAME"].ToString()#>Repository : IBaseRepository<<#=row["TABLE_NAME"].ToString()#>>//类名
+	public interface I<#=table.TableName #>Repository : IBaseRepository<<#=table.TableName #>>//类名
     {
 
     }
        }
 
-	//----------<#=row["TABLE_NAME"].ToString()#>结束----------
+	//----------<#=table.TableName #>结束----------
 	<# 
 		manager.EndBlock(); 
 	  } 

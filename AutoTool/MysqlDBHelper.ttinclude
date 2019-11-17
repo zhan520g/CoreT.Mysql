@@ -1,0 +1,347 @@
+﻿<#+
+class DbHelper
+    {
+        #region 获取数据库表
+
+        public static List<DbTable> GetDbTables(string connectionString, string database, string tables = null)
+        {
+            #region 执行sql命令
+            string sql = string.Format(@"select table_name from information_schema.tables where table_schema='{0}'", database);
+            #endregion
+            DataTable dt = GetDataTable(connectionString, sql);
+            return dt.Rows.Cast<DataRow>().Select(row => new DbTable
+            {
+                TableName = row.Field<string>("table_name"),
+            }).ToList();
+        }
+        #endregion
+
+        #region 获取表字段信息
+
+        public static List<DbColumn> GetDbColumns(string connectionString, string database, string tableName)
+        {
+            #region 执行sql命令
+            string sql = string.Format(@"
+                                    SELECT
+                                         ORDINAL_POSITION AS Colorder,
+                                          Column_Name AS ColumnName, data_type AS TypeName, COLUMN_COMMENT AS DeText,
+                                          (
+                                              CASE
+                                              WHEN data_type = 'float'
+                                              OR data_type = 'double'
+                                              OR data_type = 'decimal' THEN
+                                                  NUMERIC_PRECISION
+                                              ELSE
+                                                  CHARACTER_MAXIMUM_LENGTH
+                                              END
+                                          ) AS length,
+                                          NUMERIC_SCALE AS Scale,
+                                          (
+                                              CASE
+                                              WHEN EXTRA = 'auto_increment' THEN true
+                                              ELSE
+	                                      			 false
+                                              END
+                                          ) AS IsIdentity,
+                                          (
+                                              CASE
+                                              WHEN COLUMN_KEY = 'PRI' THEN true
+                                              ELSE
+	                                      			 false
+                                              END
+                                          ) AS IsPK,
+                                          (
+                                              CASE
+                                              WHEN IS_NULLABLE = 'NO' THEN true
+                                              ELSE
+	                                      			 false
+                                              END
+                                          ) AS CanNull,
+                                          extra,
+                                          COLUMN_DEFAULT AS DefaultVal
+                                           FROM
+                                         information_schema. COLUMNS
+		                                 WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}';", database,tableName);
+            #endregion
+            DataTable dt = GetDataTable(connectionString, sql, null);
+            return dt.Rows.Cast<DataRow>().Select(row => new DbColumn()
+            {
+                ColumnID = row["Colorder"]?.ToString(),
+                IsPrimaryKey = row["IsPK"]?.ToString(),
+                ColumnName = row["ColumnName"]?.ToString(),
+                ColumnType = row["TypeName"]?.ToString(),
+                IsIdentity = row["IsIdentity"]?.ToString(),
+                IsNullable = row["CanNull"]?.ToString(),
+                Scale = row["Scale"]?.ToString(),
+                Remark = row["DeText"]?.ToString()
+            }).ToList();
+        }
+
+        #endregion
+
+        #region 获取 DataTable
+
+        public static DataTable GetDataTable(string connectionString, string commandText, params MySqlParameter[] parms)
+        {
+             using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                MySqlCommand cmd = new MySqlCommand();
+                PrepareCommand(cmd, connection, null, commandText, parms);
+                using (MySqlDataAdapter da = new MySqlDataAdapter(cmd))
+                {
+                    DataSet ds = new DataSet();
+                    try
+                    {
+                        da.Fill(ds, "ds");
+                        cmd.Parameters.Clear();
+                    }
+                    catch (MySql.Data.MySqlClient.MySqlException ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
+                    return ds.Tables[0];
+                }
+            }
+        }
+
+
+	    private static void PrepareCommand(MySqlCommand cmd, MySqlConnection conn, MySqlTransaction trans, string cmdText, MySqlParameter[] cmdParms)
+        {
+            if (conn.State != ConnectionState.Open)
+                conn.Open();
+            cmd.Connection = conn;
+            cmd.CommandText = cmdText;
+            if (trans != null)
+                cmd.Transaction = trans;
+            cmd.CommandType = CommandType.Text;//cmdType;
+            if (cmdParms != null)
+            {
+                foreach (MySqlParameter parameter in cmdParms)
+                {
+                    if ((parameter.Direction == ParameterDirection.InputOutput || parameter.Direction == ParameterDirection.Input) &&
+                        (parameter.Value == null))
+                    {
+                        parameter.Value = DBNull.Value;
+                    }
+                    cmd.Parameters.Add(parameter);
+                }
+            }
+        }
+
+        #endregion
+
+	    #region 获取主键
+        public static string GetPrimaryKey(List<DbColumn> dbColumns)
+        {
+            string primaryKey = string.Empty;
+            if (dbColumns!=null&&dbColumns.Count>0)
+            {
+                foreach (var item in dbColumns)
+                {
+                    if (item.IsPrimaryKey=="1")
+                    {
+                        primaryKey = item.ColumnName;
+                    }
+                }
+            }
+            return primaryKey;
+        }
+        #endregion
+    }
+
+class DbTable
+    {
+        /// <summary>
+        /// 表名称
+        /// </summary>
+        public string TableName { get; set; }
+        /// <summary>
+        /// 表的架构
+        /// </summary>
+       // public string SchemaName { get; set; }
+        /// <summary>
+        /// 表的记录数
+        /// </summary>
+       // public int Rows { get; set; }
+
+        /// <summary>
+        /// 是否含有主键
+        /// </summary>
+        //public bool HasPrimaryKey { get; set; }
+    }
+
+class DbColumn
+    {
+        /// <summary>
+        /// 字段ID
+        /// </summary>
+        public string ColumnID { get; set; }
+
+        /// <summary>
+        /// 是否主键
+        /// </summary>
+        public string IsPrimaryKey { get; set; }
+
+        /// <summary>
+        /// 字段名称
+        /// </summary>
+        public string ColumnName { get; set; }
+
+        /// <summary>
+        /// 字段类型
+        /// </summary>
+        public string ColumnType { get; set; }
+
+        /// <summary>
+        /// 数据库类型对应的C#类型
+        /// </summary>
+        public string CSharpType
+        {
+            get
+            {
+                return MysqlDbTypeMap.MapCsharpType(ColumnType);
+            }
+        }
+
+		  /// <summary>
+        ///  判断是值类型,还是引用类型
+        /// </summary>
+        public Type CommonType
+        {
+            get
+            {
+                return MysqlDbTypeMap.MapCommonType(ColumnType);
+            }
+        }
+
+        /// <summary>
+        /// 小数位
+        /// </summary>
+        public string Scale { get; set; }
+
+        /// <summary>
+        /// 是否自增列
+        /// </summary>
+        public string IsIdentity { get; set; }
+
+        /// <summary>
+        /// 是否允许空
+        /// </summary>
+        public string IsNullable { get; set; }
+
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Remark { get; set; }
+    }
+
+class MysqlDbTypeMap
+    {
+        public static string MapCsharpType(string dbtype)
+        {
+            if (string.IsNullOrEmpty(dbtype)) return dbtype;
+            dbtype = dbtype.ToLower();
+            string csharpType = "object";
+            switch(dbtype)
+            {
+                case "tinyint":
+                case "smallint":
+                case "mediumint":
+                case "int":
+                case "integer":
+                    return "int";
+                case "double":
+                    return "double";
+                case "float":
+                    return "float";
+                case "decimal":
+                    return "decimal";
+                case "numeric":
+                case "real":
+                    return "decimal";
+                case "bit":
+                    return "bool";
+                case "date":
+                case "time":
+                case "year":
+                case "datetime":
+                case "timestamp":
+                    return "DateTime";
+                case "tinyblob":
+                case "blob":
+                case "mediumblob":
+                case "longblog":
+                case "binary":
+                case "varbinary":
+                    return "byte[]";
+                case "char":
+                case "varchar":                    
+                case "tinytext":
+                case "text":
+                case "mediumtext":
+                case "longtext":
+                    return "string";
+                case "point":
+                case "linestring":
+                case "polygon":
+                case "geometry":
+                case "multipoint":
+                case "multilinestring":
+                case "multipolygon":
+                case "geometrycollection":
+                case "enum":
+                case "set":
+                default:
+                    return csharpType;
+            }
+        }
+
+        public static Type MapCommonType(string dbtype)
+        {
+            if (string.IsNullOrEmpty(dbtype)) return Type.Missing.GetType();
+            dbtype = dbtype.ToLower();
+            Type commonType = typeof(object);
+            switch (dbtype)
+            {
+                case "bigint": commonType = typeof(long); break;
+                case "binary": commonType = typeof(byte[]); break;
+                case "bit": commonType = typeof(bool); break;
+                case "char": commonType = typeof(string); break;
+                case "date": commonType = typeof(DateTime); break;
+                case "datetime": commonType = typeof(DateTime); break;
+                case "datetime2": commonType = typeof(DateTime); break;
+                case "datetimeoffset": commonType = typeof(DateTimeOffset); break;
+                case "decimal": commonType = typeof(decimal); break;
+                case "float": commonType = typeof(double); break;
+                case "image": commonType = typeof(byte[]); break;
+                case "int": commonType = typeof(int); break;
+                case "money": commonType = typeof(decimal); break;
+                case "nchar": commonType = typeof(string); break;
+                case "ntext": commonType = typeof(string); break;
+                case "numeric": commonType = typeof(decimal); break;
+                case "nvarchar": commonType = typeof(string); break;
+                case "real": commonType = typeof(Single); break;
+                case "smalldatetime": commonType = typeof(DateTime); break;
+                case "smallint": commonType = typeof(short); break;
+                case "smallmoney": commonType = typeof(decimal); break;
+                case "sql_variant": commonType = typeof(object); break;
+                case "sysname": commonType = typeof(object); break;
+                case "text": commonType = typeof(string); break;
+                case "time": commonType = typeof(TimeSpan); break;
+                case "timestamp": commonType = typeof(byte[]); break;
+                case "tinyint": commonType = typeof(byte); break;
+                case "uniqueidentifier": commonType = typeof(Guid); break;
+                case "varbinary": commonType = typeof(byte[]); break;
+                case "varchar": commonType = typeof(string); break;
+                case "xml": commonType = typeof(string); break;
+                default: commonType = typeof(object); break;
+            }
+            return commonType;
+        }
+    }
+class config
+	{
+        public static readonly string ConnectionString = "data source=120.79.248.151;database=coreT;user id=sa;password=Zhan520g.;pooling=false;charset=utf8;";
+        public static readonly string DbDatabase = "coreT";
+        public static readonly string TableName = "";
+	}#>

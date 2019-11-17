@@ -8,16 +8,18 @@
 <#@ import namespace="System.Xml" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Data" #>
-<#@ import namespace="System.Data.SqlClient" #>
+<#@ assembly name="C:\Users\15292\.nuget\packages\mysql.data\8.0.18\lib\net452\MySql.Data.dll" #>
+<#@ import namespace="MySql.Data.MySqlClient" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.IO" #>
-<#@ include file="$(ProjectDir)DbHelper.ttinclude"  #>
+
+<#@ include file="$(ProjectDir)MysqlDBHelper.ttinclude"  #>
 
 <#@ include file="$(ProjectDir)ModelAuto.ttinclude"	#>
 
 
 <# 
-  var solutionsPath = Host.ResolveAssemblyReference("$(SolutionDir)"); 
+    var solutionsPath = Host.ResolveAssemblyReference("$(SolutionDir)"); 
     var OutputPath1 = solutionsPath+"\\CoreT.Repository";
 	if (!Directory.Exists(OutputPath1))
 	{
@@ -61,17 +63,15 @@ namespace CoreT.Repository
 	#>
 
 <# 
-    SqlConnection conn = new SqlConnection(config.ConnectionString); 
-    conn.Open(); 
-    System.Data.DataTable schema = conn.GetSchema("TABLES"); 
+    List<DbTable> tableList=DbHelper.GetDbTables(config.ConnectionString,config.DbDatabase);
  #>
 
 <# 
-    foreach(System.Data.DataRow row in schema.Rows) 
+     foreach(var table in tableList) 
     {  
-		manager.StartBlock(row["TABLE_NAME"].ToString()+"Repository"+".cs");
+		manager.StartBlock(table.TableName+"Repository"+".cs");
 	 #>
-	//----------<#=row["TABLE_NAME"].ToString()#>开始----------
+	//----------<#=table.TableName #>开始----------
     
 
 using System;
@@ -81,14 +81,14 @@ using CoreT.Entity;
 namespace CoreT.Repository
 {	
 	/// <summary>
-	/// <#=row["TABLE_NAME"].ToString()#>Repository
+	/// <#=table.TableName #>Repository
 	/// </summary>	
-	public class <#=row["TABLE_NAME"].ToString()#>Repository : BaseRepository<<#=row["TABLE_NAME"].ToString()#>>, I<#=row["TABLE_NAME"].ToString() #>Repository
+	public class <#=table.TableName#>Repository : BaseRepository<<#=table.TableName #>>, I<#=table.TableName #>Repository
     {
     }
 }
 
-	//----------<#=row["TABLE_NAME"].ToString()#>结束----------
+	//----------<#=table.TableName #>结束----------
 	<# 
 		manager.EndBlock(); 
 		} 

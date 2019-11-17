@@ -5,7 +5,7 @@ class DbHelper
 
         public static List<DbTable> GetDbTables(string connectionString, string database, string tables = null)
         {
-
+		
             if (!string.IsNullOrEmpty(tables))
             {
                 tables = string.Format(" and obj.name in ('{0}')", tables.Replace(",", "','"));

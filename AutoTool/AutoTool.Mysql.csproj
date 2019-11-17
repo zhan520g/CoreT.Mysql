@@ -2,13 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Update="auto.Entity\CoreT.Entity.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>CoreT.Entity.cs</LastGenOutput>
-    </None>
+    <Compile Remove="auto.Entity\CreateEntity.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="auto.Entity\CreateEntity.tt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.18" />
+    <PackageReference Include="sqlSugarCore" Version="5.0.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="auto.IRepository\CoreT.IRepository.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CoreT.IRepository.cs</LastGenOutput>
@@ -32,11 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="auto.Entity\CoreT.Entity.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CoreT.Entity.tt</DependentUpon>
-    </Compile>
     <Compile Update="auto.IRepository\CoreT.IRepository.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
