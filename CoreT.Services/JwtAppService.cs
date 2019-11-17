@@ -86,7 +86,7 @@ namespace CoreT.Services
             //自定义添加用户信息
             IEnumerable<Claim> claims = new Claim[] {
               new Claim(ClaimTypes.Name,dto.Name),
-              new Claim(ClaimTypes.Role,dto.Salt.ToString()),
+              new Claim(ClaimTypes.Role,dto.RoleId.ToString()),
               new Claim(ClaimTypes.Email,dto.Password),
               new Claim(ClaimTypes.Expiration,expiresAt.ToString())
             };

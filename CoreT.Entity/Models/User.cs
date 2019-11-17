@@ -13,7 +13,7 @@ namespace CoreT.Entity
     	     
 	   [SugarColumn(IsPrimaryKey = true, IsIdentity = true)] //是主键, 还是标识列 
 	    
-	  public int  ? id { get; set; }
+	  public int  id { get; set; }
 	     
 	  public string  name { get; set; }
  

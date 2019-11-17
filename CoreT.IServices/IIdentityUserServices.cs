@@ -12,7 +12,6 @@ namespace CoreT.IServices
 	/// </summary>	
     public interface IIdentityUserServices :IBaseServices<IdentityUser>
 	{
-
     }
 }
 

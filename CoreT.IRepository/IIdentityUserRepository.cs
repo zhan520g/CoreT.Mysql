@@ -11,6 +11,7 @@ namespace CoreT.IRepository
 	/// </summary>	
 	public interface IIdentityUserRepository : IBaseRepository<IdentityUser>//类名
     {
+
     }
        }
 

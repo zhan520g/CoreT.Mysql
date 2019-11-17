@@ -8,7 +8,7 @@ namespace CoreT.Entity.ViewModels
     {
         public object UserId { get;  set; }
         public string Token { get;  set; }
-        public long Auths { get;  set; }
+        public long Auths { get;  set; }    
         public long Expires { get;  set; }
         public bool Success { get;  set; }
     }

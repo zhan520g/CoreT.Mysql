@@ -52,9 +52,9 @@ class DbHelper
                                           ) AS IsPK,
                                           (
                                               CASE
-                                              WHEN IS_NULLABLE = 'NO' THEN true
+                                              WHEN IS_NULLABLE = 'NO' THEN false
                                               ELSE
-	                                      			 false
+	                                      			true
                                               END
                                           ) AS CanNull,
                                           extra,

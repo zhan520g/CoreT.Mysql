@@ -10,19 +10,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="auto.Entity\CreateEntity.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="auto.Entity\CreateEntity.tt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MySql.Data" Version="8.0.18" />
     <PackageReference Include="sqlSugarCore" Version="5.0.0.10" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoreT.Entity\CoreT.Entity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="auto.Entity\CreateEntity.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CreateEntity.cs</LastGenOutput>
+    </None>
     <None Update="auto.IRepository\CoreT.IRepository.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>CoreT.IRepository.cs</LastGenOutput>
@@ -46,6 +46,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="auto.Entity\CreateEntity.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CreateEntity.tt</DependentUpon>
+    </Compile>
     <Compile Update="auto.IRepository\CoreT.IRepository.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
